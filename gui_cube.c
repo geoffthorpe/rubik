@@ -21,12 +21,12 @@ static const char *helptext[] = {
 	"Change side: s",
 	"Random move: r",
 	"Thousand random moves: R",
-	"Solve cube: l",
+	"Solve cube: <enter>",
 	"Toggle spinning: space",
 	"Toggle glowing: g",
 	"Toggle paille: p",
 	"Toggle fullscreen: f",
-	"Quit: escape",
+	"Quit: <escape> or q",
 	"",
 	"Press F1 to hide help",
 	0
@@ -379,7 +379,7 @@ do_another:
 		glutPostRedisplay();
 		break;
 
-	case 'l':
+	case 13:
 		switch (solver.state) {
 		case r_solver_idle:
 			POSIXOK(r_solver_start(&solver, cube));
@@ -406,6 +406,9 @@ do_another:
 			glutReshapeWindow(prev_xsz, prev_ysz);
 		}
 		break;
+	default:
+		printf("FOO: unknown keypress %d(%c)\n",
+			key, (char)key);
 	}
 	goto do_another;
 }

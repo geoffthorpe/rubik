@@ -18,8 +18,8 @@ https://github.com/muodov/kociemba
 
 That is an implementation of the Kociemba technique for solving the Rubik's
 cube, this project imports it as a submodule. I have created some glue logic to
-convert to and from, so that when you hit the "l" key, this library is the one
-that figures out the sequence of turns required to solve the cube.
+convert to and from, so that when you hit the `<enter>` key, this library is
+the one that figures out the sequence of turns required to solve the cube.
 
 * My group theory is rusty and I don't understand the algorithm.
 * This implementation causes some build warnings, they're not my fault.
@@ -69,5 +69,5 @@ For a debugging build;
 
 === Solving the cube
 
-Use the `l` key.
+Use the `<enter>` key.
 
