@@ -1,0 +1,73 @@
+= Geoff's Rubik's cube
+
+== Introduction
+
+It started out as an attempt to write a small piece of code to use Freeglut to
+do something pretty in 3D.
+
+I'd also been wanting to implement a certain idea for recording the state of a
+Rubik's cube.
+
+So one distraction got introduced to another distraction and before you know it a
+weekend had been invested. This is the result, a 3D, glowing, spinning,
+partially see-through Rubik's cube.
+
+== Acknowledgement
+
+https://github.com/muodov/kociemba
+
+That is an implementation of the Kociemba technique for solving the Rubik's
+cube, this project imports it as a submodule. I have created some glue logic to
+convert to and from, so that when you hit the "l" key, this library is the one
+that figures out the sequence of turns required to solve the cube.
+
+* My group theory is rusty and I don't understand the algorithm.
+* This implementation causes some build warnings, they're not my fault.
+* I don't understand the implementation but I admire whoever does.
+
+== Building and running
+
+At the time of writing, this project builds cleanly on an up-to-date ubuntu
+linux system, both natively and running in Windows under WSL2. In both cases,
+the Freeglut development package should be installed, as per;
+
+   $ sudo apt-get install freeglut3-dev
+
+For a standard (optimized) build;
+
+   $ make && ./output_default-gcc/bin/cube
+
+For a debugging build;
+
+   $ export TARGET=debug-gcc
+   $ make
+   $ gdb ./output_debug-gcc/bin/cube
+
+== Using the GUI
+
+=== The 3D visualization
+
+* manual rotation, use the left-mouse button and drag.
+* manual zoom, use the right-mouse button and drag.
+* manual translation (panning), use the middle-mouse button and drag.
+* automatical rotation, use the `<spacebar>`.
+* toggle to full-screen, use the `f` key.
+* to make the squares thinner or fatter, use the `t` or `T` keys.
+
+=== Manipulating the cube
+
+* The twelve keys `0123456789ab` are hard-coded to the 2 directions that each
+  face can be rotated (anticlockwise and clockwise).
+* To make a random move, use the `r` key.
+* To make a thousand random moves, use the `R` key.
+* There is a cursor to manipulate one face at a time;
+** To identify the currently-selected face by glowing, use the `g` key.
+** To identify the currently-selected face by straw, use the `p` key.
+** To switch the currently-selected face to another, use the `s` key.
+** To turn the currently-selected face anticlockwise, use the `z` key.
+** To turn the currently-selected face clockwise, use the `x` key.
+
+=== Solving the cube
+
+Use the `l` key.
+
