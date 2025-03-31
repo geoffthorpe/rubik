@@ -93,7 +93,18 @@ unsigned int cw_turns(enum r_color c, enum r_color a, enum r_color b)
 	return _table_cw_turns[c][a][b];
 }
 
-void r_face_reorient(struct r_face *f, enum r_color top)
+unsigned int r_face_iforient(struct r_face *f, enum r_color top, unsigned int idx)
+{
+	unsigned int gap = cw_turns(f->color, f->current, top);
+	return (idx - 2 * gap) & 7;
+}
+
+enum r_color r_face_current(struct r_face *f)
+{
+	return f->current;
+}
+
+enum r_color *r_face_get_squares(struct r_face *f, enum r_color top)
 {
 	assert(!f->locked);
 	unsigned int gap = cw_turns(f->color, f->current, top);
@@ -148,17 +159,6 @@ void r_face_reorient(struct r_face *f, enum r_color top)
 		break;
 	}
 	f->current = top;
-}
-
-unsigned int r_face_iforient(struct r_face *f, enum r_color top, unsigned int idx)
-{
-	unsigned int gap = cw_turns(f->color, f->current, top);
-	return (idx - 2 * gap) & 7;
-}
-
-enum r_color *r_face_get_squares(struct r_face *f)
-{
-	assert(!f->locked);
 	f->locked = 1;
 	return f->squares;
 }
@@ -243,7 +243,7 @@ void r_cube_turn(struct r_cube *c, enum r_color color, int dir)
 	struct r_face *face = r_cube_face(c, color);
 	if (!dir) return;
 	c->sig_valid = 0;
-	enum r_color *squares = r_face_get_squares(face);
+	enum r_color *squares = r_face_get_squares(face, r_face_current(face));
 	if (dir < 0) {
 		/* anticlockwise */
 		enum r_color b0 = squares[0];
@@ -276,8 +276,7 @@ void r_cube_turn(struct r_cube *c, enum r_color color, int dir)
 	int i;
 	for (i = 0; i < 4; i++) {
 		fadj[i] = r_cube_face(c, cadj[i]);
-		r_face_reorient(fadj[i], color);
-		sadj[i] = r_face_get_squares(fadj[i]);
+		sadj[i] = r_face_get_squares(fadj[i], color);
 	}
 	if (dir < 0) {
 		/* anticlockwise */
@@ -308,8 +307,8 @@ const r_signature *r_cube_signature(struct r_cube *c)
 		for (color = r_color_first; color < r_color_illegal; color++) {
 			enum r_color **ref = &r_clockwise[color];
 			struct r_face *face = r_cube_face(c, color);
-			r_face_reorient(face, (*ref)[0]);
-			memcpy(s, r_face_get_squares(face), 8 * sizeof(*s));
+			memcpy(s, r_face_get_squares(face, (*ref)[0]),
+			       8 * sizeof(*s));
 			r_face_put_squares(face);
 			s += 8;
 		}

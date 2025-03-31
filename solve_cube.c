@@ -31,9 +31,9 @@ void kociemba_precalc(void)
 	ref2col['U'] = r_color_red;
 	ref2col['D'] = r_color_orange;
 }
-static void face2facelets(struct r_face *face, char *facelets)
+static void face2facelets(struct r_face *face, enum r_color top, char *facelets)
 {
-	enum r_color *squares = r_face_get_squares(face);
+	enum r_color *squares = r_face_get_squares(face, top);
 	*(facelets++) = col2ref[squares[0]];
 	*(facelets++) = col2ref[squares[1]];
 	*(facelets++) = col2ref[squares[2]];
@@ -52,28 +52,22 @@ static void find_improvement(struct r_line *line, struct r_cube *cube,
 	char facelets[55]; /* UU...RR...FF...DD...LL...BB... */
 	/* Up = Red */
 	face = r_cube_face(cube, r_color_red);
-	r_face_reorient(face, r_color_green);
-	face2facelets(face, facelets);
+	face2facelets(face, r_color_green, facelets);
 	/* Right = White */
 	face = r_cube_face(cube, r_color_white);
-	r_face_reorient(face, r_color_red);
-	face2facelets(face, facelets + 9);
+	face2facelets(face, r_color_red, facelets + 9);
 	/* Front = Blue */
 	face = r_cube_face(cube, r_color_blue);
-	r_face_reorient(face, r_color_red);
-	face2facelets(face, facelets + 18);
+	face2facelets(face, r_color_red, facelets + 18);
 	/* Down = Orange */
 	face = r_cube_face(cube, r_color_orange);
-	r_face_reorient(face, r_color_blue);
-	face2facelets(face, facelets + 27);
+	face2facelets(face, r_color_blue, facelets + 27);
 	/* Left = Yellow */
 	face = r_cube_face(cube, r_color_yellow);
-	r_face_reorient(face, r_color_red);
-	face2facelets(face, facelets + 36);
+	face2facelets(face, r_color_red, facelets + 36);
 	/* Back = Green */
 	face = r_cube_face(cube, r_color_green);
-	r_face_reorient(face, r_color_red);
-	face2facelets(face, facelets + 45);
+	face2facelets(face, r_color_red, facelets + 45);
 	facelets[54]='\0';
 	char *sol = solution(facelets, 24, 1000, 0, ".cache-kociemba");
 	char *s = sol;

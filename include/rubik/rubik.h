@@ -89,10 +89,10 @@ static inline int r_signature_cmp(const r_signature *a, const r_signature *b)
 
 struct r_cube *r_face_cube(struct r_face *f);
 enum r_color r_face_color(struct r_face *f);
-void r_face_reorient(struct r_face *f, enum r_color top);
+enum r_color r_face_current(struct r_face *f);
 unsigned int r_face_iforient(struct r_face *f, enum r_color top,
 			     unsigned int idx);
-enum r_color *r_face_get_squares(struct r_face *f);
+enum r_color *r_face_get_squares(struct r_face *f, enum r_color top);
 void r_face_put_squares(struct r_face *f);
 int r_face_adjacent(struct r_face *f, enum r_color c, unsigned int idx);
 

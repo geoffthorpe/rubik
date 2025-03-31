@@ -206,8 +206,7 @@ void square_render(enum r_color c, int x, int y, int sel, unsigned int glow,
 void face_render(struct r_face *face, struct cface *cface, unsigned int glow,
 		 vector *normal, float cwturn)
 {
-	r_face_reorient(face, cface->top);
-	enum r_color *c = r_face_get_squares(face);
+	enum r_color *c = r_face_get_squares(face, cface->top);
 	enum r_color center = r_face_color(face);
 	enum r_color current_color = r_cube_color(r_face_cube(face));
 	int sq;
