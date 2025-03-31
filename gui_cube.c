@@ -12,20 +12,22 @@
 
 static const char *helpprompt[] = {"Press F1 for help", 0};
 static const char *helptext[] = {
-	"Press F1 to hide help",
-	"",
 	"Rotate: left mouse drag",
 	" Scale: right mouse drag up/down",
 	"   Pan: middle mouse drag",
 	"",
-	"Toggle fullscreen: f",
-	"Toggle animation: space",
+	"Turn: [0123456789ab], 12 hard-coded turns",
+	"Turn: z (anticlockwise), x (clockwise)",
+	"Change side: s",
+	"Random move: r",
+	"Solve cube: l",
+	"Toggle spinning: space",
 	"Toggle glowing: g",
 	"Toggle paille: p",
-	"Change side: s",
-	"Turn: z (anticlockwise), x (clockwise)",
-	"Turn: [0123456789ab], 12 hard-coded turns",
+	"Toggle fullscreen: f",
 	"Quit: escape",
+	"",
+	"Press F1 to hide help",
 	0
 };
 
