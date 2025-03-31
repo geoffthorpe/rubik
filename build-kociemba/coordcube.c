@@ -1,0 +1,1 @@
+../kociemba/kociemba/ckociemba/coordcube.c
