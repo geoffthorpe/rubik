@@ -34,7 +34,6 @@ static const char *helptext[] = {
 void idle(void);
 void display(void);
 void print_help(void);
-void print_score(void);
 void reshape(int x, int y);
 void keypress(unsigned char key, int x, int y);
 void skeypress(int key, int x, int y);
@@ -55,7 +54,7 @@ long anim_start, spin;
 long nframes;
 struct r_cube *cube;
 
-#define TURNTIME_MS 300
+#define TURNTIME_MS 600
 
 #ifndef GL_FRAMEBUFFER_SRGB
 #define GL_FRAMEBUFFER_SRGB	0x8db9
@@ -133,7 +132,6 @@ void display(void)
 	glPopMatrix();
 
 	print_help();
-	print_score();
 
 	glutSwapBuffers();
 	nframes++;
@@ -171,61 +169,28 @@ void print_help(void)
 			glutBitmapCharacter(GLUT_BITMAP_9_BY_15, *s++);
 		}
 	}
-
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-
-	glPopAttrib();
-}
-
-void print_score(void)
-{
-	unsigned int i;
-	const char *s, **text;
-	char _solver[60];
-	const char *scoreprompt[] = { "Press F2 for score", 0 };
-	const char *scoretext[] = {
-		"Press F2 to hide score",
-		"",
-		_solver,
-		NULL
-	};
-
-	glPushAttrib(GL_ENABLE_BIT);
-	glDisable(GL_LIGHTING);
-	glDisable(GL_DEPTH_TEST);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, win_width, 0, win_height, -1, 1);
-
-	text = score ? scoretext : scoreprompt;
-	if (score) {
-		snprintf(_solver, 60, "Solver: %s, %d:",
-			solver.state == r_solver_idle ? "idle" :
-			solver.state == r_solver_running ? "running" : "done",
-			solver.line.bestscore);
-		for (i = 0; i < solver.line.bestused; i++)
-			snprintf(_solver + strlen(_solver), 60 - strlen(_solver),
+	const char *msg = NULL;
+	char msgbuf[60];
+	if (solver.state == r_solver_running)
+		msg = "Solving...";
+	else if (solver.state == r_solver_done) {
+		snprintf(msgbuf, 60, "Solving: ");
+		for (i = 0; i < (int)solver.line.bestused; i++)
+			snprintf(msgbuf + strlen(msgbuf), 60 - strlen(msgbuf),
 				"%x", solver.line.bestmove[i]);
+		msg = msgbuf;
 	}
-
-	for(i=0; text[i]; i++) {
+	if (msg) {
 		glColor3f(0, 0.1, 0);
-		glRasterPos2f(7, (5 - (i + 1)) * 20 - 2);
-		s = text[i];
-		while(*s) {
+		glRasterPos2f(7, 35);
+		s = msg;
+		while(*s)
 			glutBitmapCharacter(GLUT_BITMAP_9_BY_15, *s++);
-		}
 		glColor3f(0, 0.9, 0);
-		glRasterPos2f(5, (5 - (i + 1)) * 20);
-		s = text[i];
-		while(*s) {
+		glRasterPos2f(5, 37);
+		s = msg;
+		while(*s)
 			glutBitmapCharacter(GLUT_BITMAP_9_BY_15, *s++);
-		}
 	}
 
 	glPopMatrix();
@@ -292,6 +257,8 @@ do_another:
 					&solver.line.bestmove[1],
 					solver.line.bestused *
 						sizeof(solver.line.bestmove[0]));
+			else
+				reset_solver();
 			r_cube_set_color(cube, (enum r_color)(move / 2));
 			keypress_turn(move & 1 ? 1 : -1);
 		}
