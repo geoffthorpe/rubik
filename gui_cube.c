@@ -15,7 +15,7 @@ static const char *helptext[] = {
 	"Rotate: left mouse drag",
 	" Scale: right mouse drag up/down",
 	"   Pan: middle mouse drag",
-	"",
+	"Thickness: t (thinner), T (fatter)",
 	"Turn: [0123456789ab], 12 hard-coded turns",
 	"Turn: z (anticlockwise), x (clockwise)",
 	"Change side: s",
@@ -48,6 +48,7 @@ int mouse_x, mouse_y;
 int bnstate[8];
 int anim, glowing, help, score, anim_last_time;
 int turning, turning_last_time, turning_goal;
+int cube_gap = 1;
 int paille;
 struct r_solver solver;
 long anim_start, spin;
@@ -381,6 +382,19 @@ do_another:
 
 	case 's':
 		r_cube_next_color(cube);
+		glutPostRedisplay();
+		break;
+
+	case 't':
+		if (--cube_gap < 0)
+			cube_gap = 0;
+		cube_set_gap(cube_gap);
+		glutPostRedisplay();
+		break;
+
+	case 'T':
+		++cube_gap;
+		cube_set_gap(cube_gap);
 		glutPostRedisplay();
 		break;
 

@@ -25,9 +25,17 @@ static int sq2pos[8][2] = {
 	{-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}};
 
 /* The squares are separated from each other and from the edges by 'GAP'. */
-#define GAP 0.1
-#define WIDTH ((2.0 - 4*GAP) / 3.0)
-#define DEPTH 0.05
+static float cube_gap, cube_width, cube_depth;
+
+void cube_set_gap(unsigned int degree)
+{
+	cube_gap = 0.3 * pow(0.6, degree);
+	cube_width = (2.0 - 4 * cube_gap) / 3.0;
+	cube_depth = 0.05;
+}
+#define GAP cube_gap
+#define WIDTH cube_width
+#define DEPTH cube_depth
 #define GLOWSPEED 100 /* milliseconds, cycle is 4 times this number */
 
 static inline void set_color(enum r_color c, int is_side, unsigned int glow)
@@ -300,6 +308,7 @@ void draw_cube_precalc(void)
 		paille_set(subdiv, 0, cos(4 * M_PI * subdiv / PAILLE_SUBDIV_ROUND));
 		paille_set(subdiv, 1, sin(4 * M_PI * subdiv / PAILLE_SUBDIV_ROUND));
 	}
+	cube_set_gap(1);
 }
 
 void r_cube_draw(struct r_cube *cube, int paille, int glowing, float cwturn)
