@@ -20,6 +20,7 @@ static const char *helptext[] = {
 	"Turn: z (anticlockwise), x (clockwise)",
 	"Change side: s",
 	"Random move: r",
+	"Thousand random moves: R",
 	"Solve cube: l",
 	"Toggle spinning: space",
 	"Toggle glowing: g",
@@ -323,6 +324,19 @@ do_another:
 		unsigned int move = rand() % 12;
 		r_cube_set_color(cube, (enum r_color)(move / 2));
 		keypress_turn(move & 1 ? 1 : -1);
+		return;
+	}
+
+	case 'R':
+	{
+		reset_solver();
+		unsigned int repeat = 1000;
+		while (repeat--) {
+			unsigned int move = rand() % 12;
+			r_cube_turn(cube, (enum r_color)(move / 2),
+				    move & 1 ? 1 : -1);
+		}
+		glutPostRedisplay();
 		return;
 	}
 
