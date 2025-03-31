@@ -33,6 +33,10 @@ the Freeglut development package should be installed, as per;
 
    $ sudo apt-get install freeglut3-dev
 
+Also, you must import the kociemba submodule otherwise the build will fail;
+
+   $ git submodule update --init
+
 For a standard (optimized) build;
 
    $ make && ./output_default-gcc/bin/cube
