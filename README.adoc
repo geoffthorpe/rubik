@@ -12,6 +12,13 @@ So one distraction got introduced to another distraction and before you know it 
 weekend had been invested. This is the result, a 3D, glowing, spinning,
 partially see-through Rubik's cube.
 
+== Screenshots
+
+image::screenshots/cube1.png[Cube1,600,300]
+image::screenshots/cube2.png[Cube2,600,300]
+image::screenshots/cube3.png[Cube3,600,300]
+image::screenshots/cube4.png[Cube4,600,300]
+
 == Acknowledgement
 
 https://github.com/muodov/kociemba
