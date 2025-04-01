@@ -54,7 +54,12 @@ struct r_solver solver;
 long anim_start, spin;
 long nframes;
 struct r_cube *cube;
+int message_set = 0;
+const char *message;
+int message_time;
+char message_buffer[64];
 
+#define MESSAGETIME_MS 3000
 #define TURNTIME_MS 600
 
 #ifndef GL_FRAMEBUFFER_SRGB
@@ -142,6 +147,7 @@ void print_help(void)
 {
 	int i;
 	const char *s, **text;
+	float f = 1.0;
 
 	glPushAttrib(GL_ENABLE_BIT);
 	glDisable(GL_LIGHTING);
@@ -180,14 +186,24 @@ void print_help(void)
 			snprintf(msgbuf + strlen(msgbuf), 60 - strlen(msgbuf),
 				"%x", solver.line.bestmove[i]);
 		msg = msgbuf;
+	} else if (message_set) {
+		int current_time = glutGet(GLUT_ELAPSED_TIME);
+		if (current_time - message_time >= MESSAGETIME_MS) {
+			message_set = 0;
+			glutIdleFunc(anim || glowing || turning || message_set ||
+				(solver.state == r_solver_running) ? idle : 0);
+		} else {
+			f = 1.0 - (float)(current_time - message_time) / MESSAGETIME_MS;
+			msg = message;
+		}
 	}
 	if (msg) {
-		glColor3f(0, 0.1, 0);
+		glColor3f(0, 0.1 * f, 0);
 		glRasterPos2f(7, 35);
 		s = msg;
 		while(*s)
 			glutBitmapCharacter(GLUT_BITMAP_9_BY_15, *s++);
-		glColor3f(0, 0.9, 0);
+		glColor3f(0, 0.9 * f, 0);
 		glRasterPos2f(5, 37);
 		s = msg;
 		while(*s)
@@ -245,6 +261,15 @@ static void reset_solver(void)
 	}
 }
 
+static void set_message(const char *m)
+{
+	message = m;
+	message_set = 1;
+	message_time = glutGet(GLUT_ELAPSED_TIME);
+	glutIdleFunc(anim || glowing || turning || message_set ||
+		(solver.state == r_solver_running) ? idle : 0);
+}
+
 struct keybuffer keybuffer;
 
 void keypress_next(void)
@@ -282,8 +307,7 @@ do_another:
 
 	case ' ':
 		anim ^= 1;
-		glutIdleFunc(anim || glowing || turning ||
-			(solver.state == r_solver_running) ? idle : 0);
+		set_message(anim ? "Starting animation" : "Stopping animation");
 		glutPostRedisplay();
 
 		if(anim) {
@@ -313,8 +337,14 @@ do_another:
 		reset_solver();
 		unsigned int move = (key >= '0' && key <= '9') ? key - '0' :
 			key - 'a' + 10;
+		int dir = move & 1 ? 1 : -1;
+		snprintf(message_buffer, sizeof(message_buffer),
+			 "Turning %s %s",
+			 r_color_string((enum r_color)(move / 2)),
+			 dir == -1 ? "anticlockwise" : "clockwise");
+		set_message(message_buffer);
 		r_cube_set_color(cube, (enum r_color)(move / 2));
-		keypress_turn(move & 1 ? 1 : -1);
+		keypress_turn(dir);
 		return;
 	}
 
@@ -324,6 +354,7 @@ do_another:
 		unsigned int move = rand() % 12;
 		r_cube_set_color(cube, (enum r_color)(move / 2));
 		keypress_turn(move & 1 ? 1 : -1);
+		set_message("Random move");
 		return;
 	}
 
@@ -336,6 +367,7 @@ do_another:
 			r_cube_turn(cube, (enum r_color)(move / 2),
 				    move & 1 ? 1 : -1);
 		}
+		set_message("Thousand random moves");
 		glutPostRedisplay();
 		return;
 	}
@@ -343,26 +375,38 @@ do_another:
 	case 'z':
 		reset_solver();
 		keypress_turn(-1);
+		set_message("Turn anticlockwise");
 		return;
 	case 'x':
 		reset_solver();
 		keypress_turn(1);
+		set_message("Turn clockwise");
 		return;
 
 	case 'g':
 		glowing ^= 1;
-		glutIdleFunc(anim || glowing || turning ||
+		glutIdleFunc(anim || glowing || turning || message_set ||
 			(solver.state == r_solver_running) ? idle : 0);
+		snprintf(message_buffer, sizeof(message_buffer),
+			"%s glowing", glowing ? "Enable" : "Disable");
+		set_message(message_buffer);
 		glutPostRedisplay();
 		break;
 
 	case 'p':
 		paille ^= 1;
+		snprintf(message_buffer, sizeof(message_buffer),
+			"%s paille", glowing ? "Enable" : "Disable");
+		set_message(message_buffer);
 		glutPostRedisplay();
 		break;
 
 	case 's':
 		r_cube_next_color(cube);
+		snprintf(message_buffer, sizeof(message_buffer),
+			"Change side to %s",
+			r_color_string(r_cube_color(cube)));
+		set_message(message_buffer);
 		glutPostRedisplay();
 		break;
 
@@ -370,12 +414,14 @@ do_another:
 		if (--cube_gap < 0)
 			cube_gap = 0;
 		cube_set_gap(cube_gap);
+		set_message("Thinner squares");
 		glutPostRedisplay();
 		break;
 
 	case 'T':
 		++cube_gap;
 		cube_set_gap(cube_gap);
+		set_message("Fatter squares");
 		glutPostRedisplay();
 		break;
 
@@ -392,7 +438,8 @@ do_another:
 			POSIXOK(r_solver_start(&solver, cube));
 			break;
 		}
-		glutIdleFunc(anim || glowing || turning ||
+		set_message("Solving");
+		glutIdleFunc(anim || glowing || turning || message_set ||
 			(solver.state == r_solver_running) ? idle : 0);
 		break;
 
@@ -401,8 +448,10 @@ do_another:
 		if(fullscr) {
 			prev_xsz = glutGet(GLUT_WINDOW_WIDTH);
 			prev_ysz = glutGet(GLUT_WINDOW_HEIGHT);
+			set_message("Enable full screen");
 			glutFullScreen();
 		} else {
+			set_message("Disable full screen");
 			glutReshapeWindow(prev_xsz, prev_ysz);
 		}
 		break;
