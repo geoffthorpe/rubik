@@ -18,6 +18,7 @@ static const char *helptext[] = {
 	"Thickness: t (thinner), T (fatter)",
 	"Turn: [0123456789ab], 12 hard-coded turns",
 	"Turn: z (anticlockwise), x (clockwise)",
+	"Speed: k (slower), l (faster)",
 	"Change side: s",
 	"Random move: r",
 	"Thousand random moves: R",
@@ -51,7 +52,8 @@ int turning, turning_last_time, turning_goal;
 int cube_gap = 1;
 int paille;
 struct r_solver solver;
-long anim_start, spin;
+long anim_start;
+float spin, spinspeed = 1.0;
 long nframes;
 struct r_cube *cube;
 int message_set = 0;
@@ -60,7 +62,7 @@ int message_time;
 char message_buffer[64];
 
 #define MESSAGETIME_MS 3000
-#define TURNTIME_MS 600
+#define TURNTIME_MS ((float)600 / spinspeed)
 
 #ifndef GL_FRAMEBUFFER_SRGB
 #define GL_FRAMEBUFFER_SRGB	0x8db9
@@ -118,7 +120,7 @@ void display(void)
 
 	glPushMatrix();
 	if(anim) {
-		spin += current_time - anim_last_time;
+		spin += (current_time - anim_last_time) * spinspeed;
 		anim_last_time = current_time;
 	}
 	glRotatef(spin / 27.0f, 1, 0, 0);
@@ -455,6 +457,23 @@ do_another:
 			glutReshapeWindow(prev_xsz, prev_ysz);
 		}
 		break;
+
+	case 'k':
+		spinspeed -= 0.2;
+		if (spinspeed < 0.2)
+			spinspeed = 0.2;
+		else
+			set_message("Slower");
+		break;
+
+	case 'l':
+		spinspeed += 0.2;
+		if (spinspeed > 2.0)
+			spinspeed = 2.0;
+		else
+			set_message("Faster");
+		break;
+
 	default:
 		printf("FOO: unknown keypress %d(%c)\n",
 			key, (char)key);
