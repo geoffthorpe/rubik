@@ -38,9 +38,10 @@ void cube_set_gap(unsigned int degree)
 #define DEPTH cube_depth
 #define GLOWSPEED 100 /* milliseconds, cycle is 4 times this number */
 
-static inline void set_color(enum r_color c, int is_side, unsigned int glow)
+/* 'darken' is 0 for none, 1 for "a little", and 2 for "a lot" */
+static inline void set_color(enum r_color c, int darken, unsigned int glow)
 {
-	int d = is_side ? 2 : 1;
+	int d = darken == 0 ? 1 : darken == 1 ? 2 : 4;
 	float r = r2c[c][0] / d;
 	float g = r2c[c][1] / d;
 	float b = r2c[c][2] / d;
@@ -171,28 +172,28 @@ void square_render(enum r_color c, int x, int y, int sel, unsigned int glow,
 	glVertex3fv(v[6]);
 	glVertex3fv(v[7]);
 	/* Dark left; -x */
-	set_color(c, 1, glow);
+	set_color(c, 2, glow);
 	set_normal(&cface->x, 1);
 	glVertex3fv(v[0]);
 	glVertex3fv(v[4]);
 	glVertex3fv(v[7]);
 	glVertex3fv(v[3]);
 	/* Dark right; +x */
-	set_color(c, 1, glow);
+	set_color(c, 2, glow);
 	set_normal(&cface->x, 0);
 	glVertex3fv(v[5]);
 	glVertex3fv(v[1]);
 	glVertex3fv(v[2]);
 	glVertex3fv(v[6]);
 	/* Dark top; +y */
-	set_color(c, 1, glow);
+	set_color(c, 2, glow);
 	set_normal(&cface->y, 0);
 	glVertex3fv(v[0]);
 	glVertex3fv(v[1]);
 	glVertex3fv(v[5]);
 	glVertex3fv(v[4]);
 	/* Dark bottom; -y */
-	set_color(c, 1, glow);
+	set_color(c, 2, glow);
 	set_normal(&cface->y, 1);
 	glVertex3fv(v[7]);
 	glVertex3fv(v[6]);
@@ -252,7 +253,7 @@ static void paille_color(enum r_color color, int is_side)
 		r_color_green,
 		r_color_blue
 	};
-	set_color(map[color], is_side, 0);
+	set_color(map[color], is_side ? 2 : 0, 0);
 }
 
 void paille_render(struct cface *cface)
