@@ -1,6 +1,6 @@
 CFLAGS := -pthread -O2 -Wall
 #CFLAGS += -Werror -Wall -Wextra -Wshadow -Wstrict-prototypes -Wwrite-strings
-CFLAGS += -Wall -Wextra -Wshadow -Wstrict-prototypes -Wwrite-strings
+CFLAGS += -Wall -Wextra -Wshadow -Wstrict-prototypes -Wwrite-strings -Wno-implicit-fallthrough
 CFLAGS += -DNDEBUG
 
 AR := ar

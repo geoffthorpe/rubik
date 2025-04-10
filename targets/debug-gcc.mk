@@ -1,5 +1,5 @@
 CFLAGS := -pthread -ggdb3 -Wall
-CFLAGS += -Werror -Wall -Wextra -Wshadow -Wstrict-prototypes -Wwrite-strings
+CFLAGS += -Werror -Wall -Wextra -Wshadow -Wstrict-prototypes -Wwrite-strings -Wno-implicit-fallthrough
 
 AR := ar
 ARFLAGS := rcs
