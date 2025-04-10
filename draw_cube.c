@@ -27,7 +27,7 @@ static int sq2pos[8][2] = {
 /* The squares are separated from each other and from the edges by 'GAP'. */
 static float cube_gap, cube_width, cube_depth;
 
-void cube_set_gap(unsigned int degree)
+void cube_set_gap(float degree)
 {
 	cube_gap = 0.3 * pow(0.6, degree);
 	cube_width = (2.0 - 4 * cube_gap) / 3.0;
